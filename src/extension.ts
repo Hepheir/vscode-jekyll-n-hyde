@@ -12,15 +12,17 @@ const views: ViewBase[] = [];
 
 
 export function activate(context: vscode.ExtensionContext) {
-	const source = vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0
-		? vscode.workspace.workspaceFolders[0].uri.fsPath
-		: undefined;
-
-	if (!source) {
-		return;
+	const config = vscode.workspace.getConfiguration('jekyll-n-hyde');
+	var siteSource = config.get<string>('site.source')!;
+	if (siteSource.includes('${workspaceFolder}')) {
+		if (vscode.workspace.workspaceFolders === undefined) {
+			return;
+		}
+		const workspaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath;
+		siteSource = siteSource.replace('${workspaceFolder}', workspaceFolder);
 	}
 
-	refresh(context, source);
+	refresh(context, siteSource);
 
 	views.push(new CategoryView(context, 'categoryView'));
 	views.push(new DraftView(context, 'draftView'));
@@ -29,9 +31,9 @@ export function activate(context: vscode.ExtensionContext) {
 
 	updateActiveViews();
 
-	vscode.commands.registerCommand('refresh', () => refresh(context, source));
+	vscode.commands.registerCommand('refresh', () => refresh(context, siteSource));
 	vscode.commands.registerCommand('showTextDocument', showTextDocument);
-	vscode.workspace.onDidSaveTextDocument(e => refresh(context, source));
+	vscode.workspace.onDidSaveTextDocument(e => refresh(context, siteSource));
 }
 
 async function refresh(context: vscode.ExtensionContext, source: string) {
