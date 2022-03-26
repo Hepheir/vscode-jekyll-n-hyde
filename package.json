@@ -31,6 +31,19 @@
 	],
 	"main": "./out/extension.js",
 	"contributes": {
+		"configuration": [
+			{
+				"id": "jekyll-n-hyde",
+				"title": "Jekyll N Hyde",
+				"properties": {
+					"jekyll-n-hyde.site.source": {
+						"type": "string",
+						"default": "${workspaceFolder}",
+						"description": "Path for Jekyll Directory."
+					}
+				}
+			}
+		],
 		"viewsWelcome": [
 			{
 				"view": "categoryView",
